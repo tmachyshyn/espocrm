@@ -31,6 +31,9 @@ namespace tests\unit\Espo\Core\Utils;
 
 use Espo\Core\Utils\DateTime;
 
+use DateTimeZone;
+use DateTime as DateTimeStd;
+
 class DateTimeTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
@@ -100,6 +103,73 @@ class DateTimeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             '20-05-2021',
             $util->convertSystemDate('2021-05-20')
+        );
+    }
+
+    public function testCreateRandomDateTimeString1(): void
+    {
+        $randomString = DateTime::createRandomDateTimeString();
+
+        $randomDatetime = DateTimeStd::createFromFormat(
+            DateTime::SYSTEM_DATE_TIME_FORMAT,
+            $randomString
+        );
+
+        $excpectedDay = new DateTimeStd('+1 day', new DateTimeZone('UTC'));
+
+        $this->assertEquals(
+            $excpectedDay->format('Y-m-d'),
+            $randomDatetime->format('Y-m-d')
+        );
+
+        $this->assertTrue(
+            in_array(
+                $randomDatetime->format('H'),
+                range(0, 5)
+            )
+        );
+    }
+
+    public function testCreateRandomDateTimeString2(): void
+    {
+        $randomString = DateTime::createRandomDateTimeString(
+            'America/New_York',
+            10,
+            15,
+            '+5 days'
+        );
+
+        $randomDatetime = DateTimeStd::createFromFormat(
+            DateTime::SYSTEM_DATE_TIME_FORMAT,
+            $randomString,
+            new DateTimeZone('UTC')
+        );
+
+        $excpectedDay = new DateTimeStd('+5 days', new DateTimeZone('America/New_York'));
+
+        $this->assertEquals(
+            $excpectedDay->format('Y-m-d'),
+            $randomDatetime->format('Y-m-d')
+        );
+
+        $minHour = (clone $excpectedDay)
+            ->setTime(10, 0, 0)
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->format('H');
+
+        $maxnHour = (clone $excpectedDay)
+            ->setTime(15, 59, 59)
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->format('H');
+
+        $maxDatetime = clone $randomDatetime;
+        $maxDatetime->setTime(15, 59, 59);
+
+        $this->assertTrue(
+            in_array(
+                $randomDatetime->format('H'),
+                range($minHour, $maxnHour)
+            )
         );
     }
 }

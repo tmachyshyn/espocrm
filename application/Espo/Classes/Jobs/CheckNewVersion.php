@@ -66,29 +66,10 @@ class CheckNewVersion implements JobDataLess
         $this->entityManager->createEntity(Job::ENTITY_TYPE, [
             'name' => $className,
             'className' => $className,
-            'executeTime' => $this->getRunTime(),
+            'executeTime' => DateTimeUtil::createRandomDateTimeString(
+                $this->config->get('timeZone')
+            ),
         ]);
-    }
-
-    protected function getRunTime(): string
-    {
-        $hour = rand(0, 4);
-        $minute = rand(0, 59);
-
-        $nextDay = new DateTime('+ 1 day');
-        $time = $nextDay->format(DateTimeUtil::SYSTEM_DATE_FORMAT) . ' ' . $hour . ':' . $minute . ':00';
-
-        $timeZone = $this->config->get('timeZone');
-
-        if (empty($timeZone)) {
-            $timeZone = 'UTC';
-        }
-
-        $datetime = new DateTime($time, new DateTimeZone($timeZone));
-
-        return $datetime
-            ->setTimezone(new DateTimeZone('UTC'))
-            ->format(DateTimeUtil::SYSTEM_DATE_TIME_FORMAT);
     }
 
     /**

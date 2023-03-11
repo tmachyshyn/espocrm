@@ -251,4 +251,31 @@ class DateTime
     {
         return $this->convertSystemDateTime($string);
     }
+
+    /**
+     * Create a ramdom datetime string
+     */
+    public static function createRandomDateTimeString(
+        ?string $timeZone = null,
+        ?int $hourStart = 0,
+        ?int $hourEnd = 5,
+        ?string $day = '+ 1 day'
+    ): string
+    {
+        $hour = rand($hourStart, $hourEnd);
+        $minute = rand(0, 59);
+
+        if (empty($timeZone)) {
+            $timeZone = 'UTC';
+        }
+
+        $time = (new DateTimeStd($day))
+            ->format(self::SYSTEM_DATE_FORMAT) . ' ' . $hour . ':' . $minute . ':00';
+
+        $datetime = new DateTimeStd($time, new DateTimeZone($timeZone));
+
+        return $datetime
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->format(self::SYSTEM_DATE_TIME_FORMAT);
+    }
 }

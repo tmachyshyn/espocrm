@@ -30,6 +30,7 @@
 namespace Espo\Classes\Jobs;
 
 use Espo\Entities\Job;
+use Espo\Core\Utils\DateTime as DateTimeUtil;
 
 class CheckNewExtensionVersion extends CheckNewVersion
 {
@@ -47,7 +48,9 @@ class CheckNewExtensionVersion extends CheckNewVersion
         $this->entityManager->createEntity(Job::ENTITY_TYPE, [
             'name' => $className,
             'className' => $className,
-            'executeTime' => $this->getRunTime(),
+            'executeTime' => DateTimeUtil::createRandomDateTimeString(
+                $this->config->get('timeZone')
+            ),
         ]);
     }
 }
